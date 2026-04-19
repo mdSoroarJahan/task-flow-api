@@ -9,6 +9,7 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache as FacadesCache;
 use Illuminate\Support\Facades\Hash;
 
 class authController extends BaseApiController
@@ -34,5 +35,30 @@ class authController extends BaseApiController
             'user' => new UserResource($user),
             'token' => $token,
         ], 'Login successfully');
+    }
+
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+        $cacheKey = "user_profile_{$user->id}";
+
+        // if (FacadesCache::has($cacheKey)) {
+        //     logger("Profile loaded from cache: {$cacheKey}");
+        // } else {
+        //     logger("Profile cache miss, hitting DB: {$cacheKey}");
+        // }
+        $cached = FacadesCache::remember($cacheKey, now()->addHour(), function () use ($user) {
+            return new UserResource($user);
+        });
+        return $this->success($cached, 'User profile retrieved successfully');
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        $cacheKey = "user_profile_($user->id)";
+        FacadesCache::forget($cacheKey);
+        $request->user()->currentAccessToken()->delete();
+        return $this->success(null, 'Logout Successfully');
     }
 }
