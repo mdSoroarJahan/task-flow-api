@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\API\Base;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Throwable;
 
 class BaseApiController extends Controller
 {
-    protected function success($data = null, $message = 'Success', $code = 200)
+    protected function success(mixed $data = null, string $message = 'Success', int $code = 200): JsonResponse
     {
         return response()->json([
             'success' => true,
@@ -16,11 +18,17 @@ class BaseApiController extends Controller
         ], $code);
     }
 
-    protected function error($message = 'Something went wrong', $code = 400)
+    protected function error(string $message = 'Something went wrong', int $code = 400, ?\Throwable $e = null): JsonResponse
     {
-        return response()->json([
+        $response = [
             'success' => false,
             'message' => $message,
-        ], $code);
+        ];
+
+        // In development, include exception message
+        if (app()->environment('local') && $e) {
+            $response['error'] = $e->getMessage();
+        }
+        return response()->json($response, $code);
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\authController;
 use App\Http\Controllers\API\ProfileController;
+use App\Http\Controllers\API\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,5 +20,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [authController::class, 'logout']);
         // Profile update
         Route::patch('/profileUpdate', [ProfileController::class, 'update']);
+
+        // Task routes
+        Route::apiResource('tasks', TaskController::class);
     });
 });
