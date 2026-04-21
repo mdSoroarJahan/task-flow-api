@@ -19,7 +19,7 @@ class authController extends BaseApiController
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => $request->password,
         ]);
         return $this->success(new UserResource($user), 'User registered successfully', 201);
     }
