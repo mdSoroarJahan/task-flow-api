@@ -23,5 +23,8 @@ Route::prefix('v1')->group(function () {
 
         // Task routes
         Route::apiResource('tasks', TaskController::class);
+
+        // Restore task
+        Route::post('/tasks/{id}/restore', [TaskController::class, 'restore']);
     });
 });
